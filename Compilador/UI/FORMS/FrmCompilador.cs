@@ -26,11 +26,22 @@ namespace Compilador.UI.Forms
         {
             InitializeComponent();
             InicializarEditor();
+            InicializarGrid();
             AplicarTemaClaro();
-
+            
             btnTema.Click += BtnTema_Click;
         }
 
+        private void InicializarGrid()
+        {
+            gridSimbolos.Columns.Clear();
+
+            gridSimbolos.Columns.Add("Linea", "Linea");
+            gridSimbolos.Columns.Add("Tipo", "Tipo");
+            gridSimbolos.Columns.Add("Lexema", "Lexema");
+
+            gridSimbolos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
 
         private void InicializarEditor()
         {
@@ -203,6 +214,7 @@ namespace Compilador.UI.Forms
                 // 1. Limpiar controles de salida
                 txtTokens.Clear();
                 txtEstatus.Clear();
+                gridSimbolos.Rows.Clear();
 
                 // 2. Mostrar mensaje inicial
                 txtEstatus.Text = "Ha iniciado el léxico." + Environment.NewLine;
@@ -230,17 +242,22 @@ namespace Compilador.UI.Forms
 
                 // 7. Mostrar tokens agrupados por línea (formato requerido por la actividad)
                 var tokensAgrupados = resultado.Tokens
-                    .GroupBy(t => t.Tipo)
+                    .GroupBy(t => t.Linea)
                     .OrderBy(g => g.Key);
 
                 foreach (var grupo in tokensAgrupados)
                 {
-                    txtTokens.AppendText($"[{grupo.Key}] ");
+                    txtTokens.AppendText($"[Linea {grupo.Key}] ");
 
                     foreach (var token in grupo)
                     {
+                        // Mostrar códigos en txtTokens (como lo pide la actividad)
                         txtTokens.AppendText($"[{token.Tipo}] ");
+
+                        // AGREGAR ESTO PARA LLENAR EL GRID
+                        gridSimbolos.Rows.Add(token.Linea, token.Tipo, token.Lexema);
                     }
+
 
                     txtTokens.AppendText(Environment.NewLine);
                 }
